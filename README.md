@@ -48,6 +48,7 @@ cd ~ && python3 start_sim.py
 进入会话：screen -x [session_name]
 分离会话：CTRL+A , 松开，按D ，可以分离会话。会话在后台运行。
 
+kill 所以会话： pkill screen && screen -wipe
 
 ```
 
