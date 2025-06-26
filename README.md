@@ -6,11 +6,14 @@ ROS docker image using the turtlebot3 and Gazebo simulation
 ```json
 {
     "registry-mirrors": [
-        "https://docker.1ms.run",
         "https://docker.xuanyuan.me",
+        "https://mirror.ccs.tencentyun.com",
+        "https://docker.mirrors.ustc.edu.cn"
     ]
 }
 ```
+
+docker pull docker.xuanyuan.me/library/althack/ros2:humble-base
 
 ```bash
 # restart docker
@@ -54,4 +57,4 @@ kill 所以会话： pkill screen && screen -wipe
 # ref
 https://emanual.robotis.com/docs/en/platform/turtlebot3/quick-start/
 docker version : 27.2.0
-ros : noetic
+ros : humble
