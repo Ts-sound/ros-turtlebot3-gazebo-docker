@@ -13,15 +13,12 @@ ROS docker image using the turtlebot3 and Gazebo simulation
 }
 ```
 
-docker pull docker.xuanyuan.me/library/althack/ros2:humble-base
-
 ```bash
 # restart docker
 sudo systemctrl daemon-reload
 sudo systemctrl restart docker
 ```
 
-> dockerfile用的镜像是docker.1ms.run，可根据情况进行替换；
 
 # build docker
 ```bash

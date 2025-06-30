@@ -11,7 +11,6 @@ fi
 
 
 # setup env 
-echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc
 echo 'export ROS_DOMAIN_ID=30 #TURTLEBOT3' >> /root/.bashrc
 echo 'source /usr/share/gazebo/setup.sh' >> /root/.bashrc
 echo 'source /opt/ros/humble/setup.bash' >> /root/.bashrc
