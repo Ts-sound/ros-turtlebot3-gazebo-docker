@@ -17,8 +17,8 @@ RUN apt-get install -y \
 
 RUN apt-get install -y  python3-colcon-common-extensions
 
-# install rviz2
-RUN apt-get install -y ros-humble-rviz2
+# install rviz2 rqt-graph
+RUN apt-get install -y ros-humble-rviz2 ros-humble-rqt-graph
 
 # install gazebo
 RUN apt-get install -y ros-humble-gazebo-*
@@ -33,6 +33,8 @@ RUN apt-get install -y \
     ros-humble-navigation2 \
     ros-humble-nav2-bringup
 
+# or install desktop full
+# RUN apt-get install -y  ros-humble-desktop-full
     
 
 RUN rm -rf /var/lib/apt/lists/*
