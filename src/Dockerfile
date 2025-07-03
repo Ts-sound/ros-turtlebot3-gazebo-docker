@@ -1,5 +1,6 @@
 # pull image
 FROM althack/ros2:humble-base
+# FROM osrf/ros:humble-desktop-full
 
 # install deb
 RUN apt-get update && apt-get install -y \
