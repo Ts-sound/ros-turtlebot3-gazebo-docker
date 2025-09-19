@@ -30,8 +30,8 @@ jobs:
     - name: Build Docker image
       uses: docker/build-push-action@v4
       with:
-        context: .
-        file: ./src/Dockerfile
+        context: ./src
+        file: ./Dockerfile
         tags: |
           ${{ env.DOCKER_IMAGE_NAME }}:${{ env.TAG_NAME }}
           ${{ env.DOCKER_IMAGE_NAME }}:latest
