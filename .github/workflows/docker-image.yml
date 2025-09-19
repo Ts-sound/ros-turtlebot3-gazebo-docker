@@ -31,7 +31,7 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: ./src
-        file: ./Dockerfile
+        file: ./src/Dockerfile
         tags: |
           ${{ env.DOCKER_IMAGE_NAME }}:${{ env.TAG_NAME }}
           ${{ env.DOCKER_IMAGE_NAME }}:latest
