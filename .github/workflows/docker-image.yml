@@ -13,6 +13,9 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
     
+    permissions:
+      contents: write  # 允许创建 Release
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -30,7 +33,7 @@ jobs:
     - name: Build Docker image
       uses: docker/build-push-action@v4
       with:
-        context: ./src
+        context: ./src # Dockerfile 中 的上下文路径
         file: ./src/Dockerfile
         tags: |
           ${{ env.DOCKER_IMAGE_NAME }}:${{ env.TAG_NAME }}
