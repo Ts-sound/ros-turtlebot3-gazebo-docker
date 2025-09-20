@@ -1,0 +1,14 @@
+{
+    "recommendations": [
+        "ms-vscode.cpptools",
+        "twxs.cmake",
+        "mhutchie.git-graph",
+        "donjayamanne.githistory",
+        "codezombiech.gitignore",
+        "yzhang.markdown-all-in-one",
+        "shd101wyy.markdown-preview-enhanced",
+        "davidanson.vscode-markdownlint",
+        "ms-python.python",
+        "ms-vscode.cpptools-extension-pack"
+    ]
+}
