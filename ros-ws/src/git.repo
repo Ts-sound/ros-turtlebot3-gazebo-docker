@@ -1,7 +1,7 @@
-git submodule add -b humble https://github.com/ROBOTIS-GIT/DynamixelSDK.git src/DynamixelSDK
+git submodule add -b humble https://github.com/ROBOTIS-GIT/DynamixelSDK.git ros-ws/src/DynamixelSDK
 
-git submodule add -b humble https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git src/turtlebot3_msgs
+git submodule add -b humble https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git ros-ws/src/turtlebot3_msgs
 
-git submodule add -b humble https://github.com/ROBOTIS-GIT/turtlebot3.git src/turtlebot3
+git submodule add -b humble https://github.com/ROBOTIS-GIT/turtlebot3.git ros-ws/src/turtlebot3
 
-git submodule add -b humble https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git src/turtlebot3_simulations
+git submodule add -b humble https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git ros-ws/src/turtlebot3_simulations
