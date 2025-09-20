@@ -3,6 +3,16 @@
 使用 turtlebot3 & Gazebo 配置了一个可以 方便启动的ros2 humble slam仿真环境（docker容器）。
 ![gazebo_sim](./assets/gazebo_sim.png)
 
+## clone项目
+
+* `git clone -b ros2-humble --recurse-submodules https://github.com/Ts-sound/ros-turtlebot3-gazebo-docker.git`
+* 如果github连接失败，可尝试修改`hosts` :
+
+```bash
+echo "140.82.114.4    github.com" >> /etc/hosts
+echo "140.82.113.3    github.com" >> /etc/hosts
+```
+
 ## 编译docker镜像
 
 ```bash
