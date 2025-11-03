@@ -12,7 +12,6 @@ fi
 # setup env 
 #TODO: change this to Dockerfile ARG
 echo 'export ROS_DOMAIN_ID=30 #TURTLEBOT3' >> /root/.bashrc
-echo 'source /usr/share/gazebo/setup.sh' >> /root/.bashrc
 echo 'source /opt/ros/humble/setup.bash' >> /root/.bashrc
 source /root/.bashrc
 
