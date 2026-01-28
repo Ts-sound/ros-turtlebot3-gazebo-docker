@@ -37,32 +37,25 @@ RUN apt install -y \
 # or install desktop full
 # RUN apt install -y  ros-humble-desktop-full
     
-
+# clean
 RUN rm -rf /var/lib/apt/lists/*
-
-# build turtlebot3_simulations , move it to build_tutlebot3_sim.sh
-# RUN mkdir -p ~/turtlebot3_ws/src/ \
-#     && cd ~/turtlebot3_ws/src/ \
-#     && git clone -b humble https://github.com/ROBOTIS-GIT/DynamixelSDK.git \
-#     && git clone -b humble https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git \
-#     && git clone -b humble https://github.com/ROBOTIS-GIT/turtlebot3.git \
-#     && git clone -b humble https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git \
-#     && /bin/bash -c "source /opt/ros/humble/setup.bash && cd ~/turtlebot3_ws && colcon build --symlink-install "
-
-
-RUN mkdir /var/run/sshd
-
 
 # permit ssh root login
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
-COPY entrypoint.sh /root/entrypoint.sh
-COPY start_sim.py /root/start_sim.py
+# 
+RUN /bin/bash -c "echo 'export ROS_DOMAIN_ID=30 #TURTLEBOT3' >> ~/.bashrc \
+    && echo 'source /usr/share/gazebo/setup.sh' >> ~/.bashrc \
+    && echo 'source /opt/ros/humble/setup.bash' >> ~/.bashrc
+    && source ~/.bashrc "
+
+# build turtlebot3
+COPY ros-ws /root/ros-ws
+
+RUN /bin/bash -c " cd /root/ros-ws \
+ && ./build_turtlebot3_sim.sh "
 
 # 
 EXPOSE 22
-
-
-ENTRYPOINT ["bash","/root/entrypoint.sh"]
 
