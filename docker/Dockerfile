@@ -47,7 +47,7 @@ RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/
 # 
 RUN /bin/bash -c "echo 'export ROS_DOMAIN_ID=30 #TURTLEBOT3' >> ~/.bashrc \
     && echo 'source /usr/share/gazebo/setup.sh' >> ~/.bashrc \
-    && echo 'source /opt/ros/humble/setup.bash' >> ~/.bashrc
+    && echo 'source /opt/ros/humble/setup.bash' >> ~/.bashrc \
     && source ~/.bashrc "
 
 # build turtlebot3
