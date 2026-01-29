@@ -1,191 +1,149 @@
 # ros-turtlebot3-gazebo-docker
 
-使用 turtlebot3 & Gazebo 配置了一个可以 方便启动的ros2 humble slam仿真环境（docker容器）。
+基于 ROS 2 Humble、TurtleBot3 与 Gazebo 的一键仿真镜像与启动脚本。该仓库提供可用于本地或虚拟机环境的 Docker 镜像、启动脚本与编译工具，方便快速搭建 SLAM / 仿真开发环境。
+
 ![gazebo_sim](./assets/gazebo_sim.png)
 
-## clone项目
+## 特性
 
-* `git clone -b ros2-humble --recurse-submodules https://github.com/Ts-sound/ros-turtlebot3-gazebo-docker.git`
-* 如果github连接失败，可尝试修改`hosts` :
+- 基于 ROS 2 Humble 的镜像，预装 Gazebo、RViz、Cartographer、Navigation2 等常用包
+- 包含编译与运行的脚本 `build.sh`、`start_docker.sh`、`start_sim.py`
+- 支持把宿主机工作区挂载到容器，便于开发与调试
+
+## 前提
+
+- 已安装 Docker
+- 若在国内网络，可能需配置代理或使用镜像站加速镜像拉取
+
+## 克隆仓库
+
+包含子模块：
 
 ```bash
-echo "140.82.114.4    github.com" >> /etc/hosts
-echo "140.82.113.3    github.com" >> /etc/hosts
+git clone --recurse-submodules https://github.com/Ts-sound/ros-turtlebot3-gazebo-docker.git
 ```
 
-## 编译docker镜像
+（若无法访问 GitHub，可尝试调整 hosts 或使用代理）
+
+## 构建 Docker 镜像
+
+进入 `src` 目录并运行构建脚本：
 
 ```bash
 cd src && ./build.sh
 ```
 
-* 编译成功后，使用 `sudo docker images`查看编译好的镜像，如下：
+构建成功后，使用 `sudo docker images` 查看镜像：
 
 ```bash
-~$ sudo docker images
-REPOSITORY                   TAG                 IMAGE ID       CREATED             SIZE
-ros2-humble-turtlebot3-sim   latest              9d824a494dd1   19 hours ago        4.55GB
-
+sudo docker images
 ```
 
-* 由于国内网络的问题，从dockerhub拉取原始镜像大概率会失败，需要通过镜像站或代理，这个自行搜索可用的镜像站；
-* 我这使用github Action 于编译好了镜像，也可以直接下载导入使用：
-  * Release 地址：https://github.com/Ts-sound/ros-turtlebot3-gazebo-docker/releases/tag/v0.0.4
-  * 文件 ： https://github.com/Ts-sound/ros-turtlebot3-gazebo-docker/releases/download/v0.0.4/ros2-humble-turtlebot3-sim-v0.0.4.tar.gz
-  * 使用docker导入镜像：```sudo docker < ros2-humble-turtlebot3-sim-v0.0.4.tar.gz```
-* 导入成功后，使用 `sudo docker images` 查看。
+> 说明：在国内网络环境下直接从 Docker Hub 拉取基础镜像可能失败，可使用国内镜像站或代理。
 
-### Dockerfile说明
+如果你不方便构建，本仓库在 Releases 中提供了docker镜像导出文件（示例）：
 
-```Dockerfile
-# 使用 ROS2 Humble 基础镜像作为构建起点
-FROM althack/ros2:humble-base
+- 镜像文件: https://github.com/Ts-sound/ros-turtlebot3-gazebo-docker/releases/download/v0.0.5/ros2-humble-turtlebot3-sim-v0.0.5.tar.gz
 
-# 更新软件包索引并安装基础工具
-# openssh-server: 提供 SSH 远程访问能力
-# vim/zip/git/screen: 开发调试常用工具
-RUN apt update && apt install -y \
-    openssh-server vim zip git screen
+导入示例：
 
-# 设置美式键盘布局
-RUN echo "keyboard-configuration keyboard-configuration/layoutcode string us" | debconf-set-selections && \
-    echo "keyboard-configuration keyboard-configuration/variantcode string" | debconf-set-selections && \
-    apt install -y keyboard-configuration 
-
-# joy: 游戏手柄控制节点
-# teleop-twist-joy/keyboard: 键盘/手柄遥操作
-# laser-proc: 激光雷达数据处理工具
-RUN apt install -y \
-    ros-humble-joy ros-humble-teleop-twist-joy \
-    ros-humble-teleop-twist-keyboard ros-humble-laser-proc 
-
-# 安装 Colcon 构建系统（ROS2 标准构建工具）
-RUN apt install -y python3-colcon-common-extensions
-
-# 安装可视化工具
-# rviz2: ROS 可视化工具
-# rqt-graph: 节点拓扑关系可视化
-RUN apt install -y ros-humble-rviz2 ros-humble-rqt-graph
-
-# 安装 Gazebo 仿真环境及其 ROS 集成
-# ros-humble-gazebo-*: 包含所有 Gazebo 相关插件和接口
-RUN apt install -y ros-humble-gazebo-*
-
-# 安装 SLAM 工具 Cartographer
-RUN apt install -y \
-    ros-humble-cartographer \
-    ros-humble-cartographer-ros
-
-# 安装导航系统 Navigation2
-RUN apt install -y \
-    ros-humble-navigation2 \
-    ros-humble-nav2-bringup
-
-# 清理 apt 缓存以减小镜像体积
-RUN rm -rf /var/lib/apt/lists/*
-
-# 创建 SSH 服务运行目录（sshd 需要此目录）
-RUN mkdir /var/run/sshd
-
-# 修改 SSH 配置：
-# 1. 允许 root 通过密码登录
-# 2. 启用密码认证（默认禁用）
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
-
-# 复制启动脚本到容器内
-# entrypoint.sh: 容器初始化脚本
-# start_sim.py: 仿真环境启动脚本（可选）
-COPY entrypoint.sh /root/entrypoint.sh
-COPY start_sim.py /root/start_sim.py
-
-# 声明容器运行时暴露的端口（SSH 默认端口）
-EXPOSE 22
-
-# 设置容器入口点脚本，在启动时自动执行
-ENTRYPOINT ["bash","/root/entrypoint.sh"]
+```bash
+sudo docker load < ros2-humble-turtlebot3-sim-v0.0.5.tar.gz
 ```
 
-## docker镜像启动
+## 启动容器（示例）
+
+仓库提供了 `start_docker.sh`，会基于构建好的镜像启动容器：
 
 ```bash
 cd src && sudo ./start_docker.sh
 ```
 
-* `start_docker.sh` 文件说明：
-  * 其中 `ROOT_PASSWD=1` 密码存在一定的 **安全风险** ，请进入容器后修改密码，ssh也可以禁用root用户登录并设置密钥登陆。
-  * 由于我是在自己电脑里虚拟机里面运行的docker,网络环境有隔离，外部无法访问，为了使用方便就按简单的方式来。
+或者手动运行：
 
 ```bash
 docker run -itd \                          # 后台交互模式
-  -e ROOT_PASSWD=1 \                       # 传递root密码环境变量（需在容器内处理）
-  --privileged \                           # 赋予特权（访问设备等）
-  --shm-size=1g \                          # 共享内存1GB（Gazebo等需要）
-  --ulimit memlock=-1 \                    # 不限制锁定内存
-  --ulimit stack=67108864 \                # 设置栈大小为64MB
+  --privileged \                           # 赋予特权（如访问硬件设备）
+  --shm-size=1g \                          # 共享内存
+  --ulimit memlock=-1 \                    # 允许进程锁定内存
+  --ulimit stack=67108864 \                # 设置栈大小
   --name sim \                             # 容器名称
-  -p 2202:22 \                             # 端口映射：宿主机2202->容器22
-  ros2-humble-turtlebot3-sim \             # 镜像名称
-  /bin/bash -c "service ssh start && /bin/bash"  # 启动命令：启动SSH并进入bash
+  -p 2202:22 \                             # 将容器 SSH 映射到宿主机 2202
+  ros2-humble-turtlebot3-sim \             # 镜像名称（以实际镜像名为准）
+  /bin/bash -c "service ssh start && /bin/bash"
 ```
 
-* 也可以添加 `-v /home/t/Desktop/workspace/git-repo:/root/ws` ，将自己的工作空间
+安全提示：容器内启用 root 密码登录有安全风险，建议启动后尽快修改密码、禁用密码登录并使用 SSH 密钥登录。
 
-## ssh 登录容器
+可以将宿主机目录挂载到容器：
 
-* 由于通过 `-p 2202:22` 我们把ssh端口映射到虚拟机的 `2202` 端口，可以通过ssh进入容器：
-
-```powershell
-PS C:\Users\tong> ssh root@192.168.129.152 -p 2202
-root@192.168.129.152's password:
+```bash
+-v /path/to/your/ws:/root/ws
 ```
 
-* 输入默认密码 `1` , 就可以进入了。
-* 这里推荐使用 mobaxterm 工具，一个windows上非常好用且免费的远程软件（X11 server, SSH , ftp , ... ）。
-* 后面 gazebo,rviz 图像转发直接使用 mobaxterm自带的x11 server, 不然还要配置其他的图像转发工具。
-* mobaxterm官方网站： https://mobaxterm.mobatek.net/
+## SSH 登录容器
 
-## 启动仿真环境
+示例（宿主机或其它机器）：
 
-### 编译 turtlebot3_simulations 组件
+```bash
+ssh root@<宿主机IP> -p 2202
+```
 
-* git clone 时要包含子模块克隆：`git clone -b ros2-humble --recurse-submodules https://github.com/Ts-sound/ros-turtlebot3-gazebo-docker.git`
-* 仿真环境工作空间为 `ros-ws`,其中 `build_turtlebot3_sim.sh` 是用来编译 turtlebot3_simulations 相关组件的。
-* 将 `ros-ws` 映射到容器 `~/ros-ws` 目录，或直接复制进去，
-* 容器里编译 turtlebot3_simulations 组件 ：`cd ~/ros-ws && source /opt/ros/humble/setup.bash &&  colcon build --symlink-install`
+在 Windows 上推荐使用 MobaXterm（自带 X11 server，方便显示 Gazebo/Rviz 窗口）。
 
-### 启动
+## 在容器内编译仿真组件
 
-* 这里通过 python 使用screen 写了个一键启动脚本 `start_sim.py`
-* 运行：
+本仓库的仿真工作区为 `ros-ws`，`build_turtlebot3_sim.sh` 用于编译 `turtlebot3_simulations` 等组件。
+
+示例：
+
+```bash
+# 进入工作区并配置环境
+cd ~/ros-ws
+source /opt/ros/humble/setup.bash
+colcon build --symlink-install
+```
+
+## 启动仿真（一键脚本）
+
+仓库提供 `start_sim.py`，使用 screen 启动多个节点会话（world/gazebo、slam、teleop 等）。在容器内运行：
 
 ```bash
 cd ~/ros-ws && python3 start_sim.py
 ```
 
-* 查看screen会话：
+查看 screen 会话：
 
 ```bash
-~# screen -ls
+screen -ls
+```
+
+输出:
+
+```bash
 There are screens on:
         7609.key        (09/20/2025 04:03:15 AM)        (Detached)
         7592.world      (09/20/2025 04:03:15 AM)        (Detached)
         7598.slam       (09/20/2025 04:03:15 AM)        (Detached)
-3 Sockets in /run/screen/S-root.
+3 Sockets in /run/screen/S-root
 ```
 
-* 其中：
-  * key ：启动 `ros2 run turtlebot3_teleop teleop_keyboard` ,用来通过键盘控制仿真小车运动。
-  * world ：启动 `ros2 launch turtlebot3_gazebo turtlebot3_house.launch.py` , gazebo 仿真。
-  * slam ：启动 `ros2 launch turtlebot3_cartographer cartographer.launch.py use_sim_time:=True` ， 启动 cartographer node 和 rviz。
+示例会话说明：
 
-* 效果如下：
-![gazebo_sim](./assets/gazebo_sim.png)
+- `world`：启动 Gazebo 世界（例如 `turtlebot3_house.launch.py`）
+- `slam`：启动 Cartographer（`cartographer.launch.py use_sim_time:=True`）
+- `key`：键盘遥控（`ros2 run turtlebot3_teleop teleop_keyboard`）
 
-* 后面就可以根据自己的需求修改 cartographer组件 源码进行测试，或者添加一些其他的 slam 组件进行使用。
-* gazebo 仿真相对来说 对电脑的要求不是很高，我的测试机 CPU是 i5-10210U，内存16G的轻薄本，就可以正常跑。
+运行效果如上图所示（见 assets/gazebo_sim.png）。
 
-## repo
+## 问题事项
 
-* https://github.com/Ts-sound/ros-turtlebot3-gazebo-docker
-* 参考： https://emanual.robotis.com/docs/en/platform/turtlebot3/quick-start/
+- 问题: Gazebo首次打开的时候，会先从网上或者它自己的模型库里检索模型，所以如果找不到目标模型的话，打开Gazebo就会发现一直卡着不动
+
+> 解决方案: 使用代理拉取资源 , 或手动更新 `git clone https://github.com/osrf/gazebo_models && cp -r gazebo_models/* ~/.gazebo/models/`
+
+## 参考
+
+- [TurtleBot3 Quick Start](https://emanual.robotis.com/docs/en/platform/turtlebot3/quick-start/)
+
+---
