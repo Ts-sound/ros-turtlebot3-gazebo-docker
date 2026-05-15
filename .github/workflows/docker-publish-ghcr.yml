@@ -1,0 +1,23 @@
+name: Publish Docker Image to GHCR
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish to GHCR
+        uses: Ts-sound/docker-publish-ghcr@v1
+        with:
+          image_name: ros-turtlebot3-gazebo-docker
+          docker_context: .
+          dockerfile: ./docker/Dockerfile
+          submodules: recursive
+          push: true

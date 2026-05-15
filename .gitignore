@@ -32,6 +32,7 @@
 *.app
 
 ## 
+build.log
 src/build.log
 ros-ws/build
 ros-ws/install
