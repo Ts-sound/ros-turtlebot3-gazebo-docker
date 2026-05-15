@@ -18,6 +18,6 @@ jobs:
         with:
           image_name: ros-turtlebot3-gazebo-docker
           docker_context: .
-          dockerfile: ./docker/Dockerfile
+          dockerfile: ./Dockerfile
           submodules: recursive
           push: true
