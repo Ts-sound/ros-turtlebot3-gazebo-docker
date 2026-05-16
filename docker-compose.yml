@@ -1,6 +1,6 @@
 services:
   sim:
-    image: ros2-humble-turtlebot3-sim:latest
+    image: ghcr.io/ts-sound/ros-turtlebot3-gazebo-docker:latest
     container_name: sim
     privileged: true
     shm_size: "1g"
@@ -12,7 +12,7 @@ services:
         soft: 67108864
         hard: 67108864
     ports:
-      - "2202:22"
+      - "2204:22"
     # 挂载本地工作区（取消注释并修改路径）
     # volumes:
     #   - /path/to/your/ws:/root/ws

@@ -60,7 +60,7 @@ docker compose up -d
 |--------|------|
 | privileged | 赋予容器特权（访问硬件设备） |
 | shm_size | 共享内存 1GB |
-| ports | 宿主机 2202 端口映射到容器 SSH (22) |
+| ports | 宿主机 2204 端口映射到容器 SSH (22) |
 | ulimits | memlock: -1, stack: 64MB |
 
 **挂载本地工作区**：编辑 `docker-compose.yml`，取消 `volumes` 注释并修改路径：
@@ -89,12 +89,14 @@ docker compose down
 ### SSH 登录容器
 
 ```bash
-ssh root@<宿主机IP> -p 2202
+ssh root@<宿主机IP> -p 2204
 ```
 
 > **安全提示**：容器内启用 root 密码登录存在安全风险，建议启动后尽快修改密码、禁用密码登录并配置 SSH 密钥。
 
 ### 运行仿真
+
+> **提示**：运行 Gazebo 图形界面需要 X Server 环境。Windows 用户推荐使用 MobaXterm（自带 X Server），Linux 用户需确保宿主机有 X11 环境，或自行配置其他 X Server 图像转发服务。
 
 进入容器后，运行一键仿真脚本：
 
